@@ -24,9 +24,9 @@ Please prepare by reading through the relevant lecture materials.
 #include <map>
 #include <iostream>
 #include <vector>
-#include <unordered_map>
+#include <map>
 
-// NOTE: -std=gnu++0x or -std=c++0x must be enabled for c++11 stuff to work
+// NOTE: -std=gnu++0x or -std=c++0x must be enabled for c++ 2011 stuff to work
 
 // Globals to be used for the program
 struct node
@@ -46,7 +46,7 @@ struct node
 int main(int argc, char* argv[])
 {
 	// Instantiate the map
-    std::unordered_map<std::string, node*> cityNodes;
+    std::map<std::string, node*> cityNodes;
 
 	// Build the tree
 
