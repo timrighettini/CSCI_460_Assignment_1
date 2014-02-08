@@ -1,10 +1,6 @@
 // CSCI_460_Assignment_1.cpp : Defines the entry point for the console application.
 //
 
-#include <map>
-#include <iostream>
-#include <vector>
-
 /*
 NOTE:
 
@@ -25,6 +21,12 @@ Please prepare by reading through the relevant lecture materials.
 
 */
 
+#include <map>
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+
+// NOTE: -std=gnu++0x or -std=c++0x must be enabled for c++11 stuff to work
 
 // Globals to be used for the program
 struct node
@@ -37,13 +39,14 @@ struct node
 	// and can be made smaller and smaller as time goes on
 	int totalCost;
 
-	std::vector<std::string> children; // List of decendants
+	std::vector<std::string> children; // List of descendants
 	bool isExpanded; // If the node is expanded, this will be true, will prevent loops
 };
 
 int main(int argc, char* argv[])
 {
 	// Instantiate the map
+    std::unordered_map<std::string, node*> cityNodes;
 
 	// Build the tree
 
