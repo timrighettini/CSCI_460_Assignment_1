@@ -1,5 +1,6 @@
 Name:  Tim Righettini
 USC ID: 9445525333
+E-mail Address: trighett@usc.edu
 
 -- CSCI 460 Assignment #1 README --
 
