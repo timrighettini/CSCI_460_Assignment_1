@@ -59,14 +59,15 @@ struct Node
 
 
 // Function Prototypes
-void GeneralSearch(std::map<std::string, Node*>&, std::vector<Node*> &);
-void EnvectorBFS(std::map<std::string, Node*>&, std::vector<Node*> &);
+void GeneralSearch(std::map<std::string, Node*>&, std::vector<Node*> &, std::vector<Node*> &, Node *);
+void EnqueueBFS(std::map<std::string, Node*>&, std::vector<Node*> &, Node *);
 
 int main(int argc, char* argv[])
 {
     // Instantiate the map
     std::map<std::string, Node*> cityNodes;
-    std::vector<Node*> currentNodes; // Will be the vector used for queueing for the three queueing functions
+    std::vector<Node*> currentNodes; // Will be the vector used for Queuing for the three Queuing functions
+    std::vector<Node*> exploredNodes; // Will be the vector used for keeping track of what has been found so far
 
     // Build the tree
 
@@ -263,9 +264,13 @@ int main(int argc, char* argv[])
 
     // Add Alexandria to the starting set of nodes for GeneralSearch()
     currentNodes.push_back(cityNodes["Alexandria"]);
+    currentNodes[0]->isExpanded = true;
 
     // Run the Search Function
-    GeneralSearch(cityNodes, currentNodes);
+    // Argument 0 = map of all nodes
+    // Argument 1 = queue of expanded nodes
+    // Argument 2 = Goal Node
+    GeneralSearch(cityNodes, currentNodes, exploredNodes, cityNodes["Luxor"]);
 
     // Make sure to deallocate everything on the heap
     std::map<std::string, Node*>::iterator mapIterator = cityNodes.begin();
@@ -284,12 +289,69 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void GeneralSearch(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &currentNodes)
+void GeneralSearch(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &currentNodes, std::vector<Node*> &exploredNodes, Node *goalNode)
 {
+    while (true)
+    {
+        // If nothing left to search, then exit
+        if (currentNodes.size() == 0)
+        {
+            std::cerr << "ERROR: Path to Goal not found: " << goalNode->name << std::endl;
+            return;
+        }
 
+        // Goal Test
+        Node* nodeToTest = currentNodes[0];
+        currentNodes.erase(currentNodes.begin());
+
+        if (nodeToTest->name == goalNode->name)
+        {
+            // Output the list of cities searched here
+            std::cout << "Found GOAL!!!!! -> " << goalNode->name << std::endl;
+            std::cout << "Order of cities traversed: " << std::endl;
+            for (unsigned int i = 0; i < exploredNodes.size(); i++)
+            {
+                std::cout << exploredNodes[i]->name;
+                if (i != exploredNodes.size() - 1)
+                {
+                    std::cout << ", ";
+                }
+                else
+                {
+                    std::cout << ", " << goalNode->name << std::endl;
+                }
+
+            }
+            return;
+        }
+
+        // Queuing Function
+        EnqueueBFS(cityNodes, currentNodes, nodeToTest); // BPS
+        exploredNodes.push_back(nodeToTest);
+    }
 }
 
-void EnvectorBFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &currentNodes)
+void EnqueueBFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &currentNodes, Node *nodeToTest)
 {
+    // Add values from expanded node into a temp vector
+    std::vector<std::string> expandedNames;
 
+    for (unsigned int i = 0; i < nodeToTest->children.size(); i++)
+    {
+        if (!cityNodes[nodeToTest->children[i].name]->isExpanded) // Check to see if the node has already been expanded
+        {
+            expandedNames.push_back(nodeToTest->children[i].name);
+        }
+    }
+
+    // Sort Them
+    std::sort(expandedNames.begin(), expandedNames.end());
+
+    // Add them into the currentNodes Queue
+    while (!expandedNames.empty())
+    {
+        currentNodes.push_back(cityNodes[expandedNames[0]]);
+        cityNodes[expandedNames[0]]->isExpanded = true;
+        expandedNames.erase(expandedNames.begin());
+    }
 }
