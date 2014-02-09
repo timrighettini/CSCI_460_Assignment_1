@@ -53,15 +53,33 @@ struct Node
     // and can be made smaller and smaller as time goes on
     int totalCost;
 
-    bool isExpanded; // If the Node is expanded, this will be true, will prevent loops
+    bool isQueued; // If the Node is expanded, this will be true, will prevent loops
 };
 
+// Used for a aorting comparison
+struct FunctorUCS
+{
+        // Overloading () operators for std::sort()
+    bool operator ()(Node *a, Node *b)
+    {
+        if (a->totalCost < b->totalCost) return true;
+        if (a->totalCost > b->totalCost) return false;
 
+        if (a->name < b->name) return true;
+        if (a->name > b->name) return false;
+
+        return false;
+    }
+} functorUCS;
+
+bool isUCS = false;
 
 // Function Prototypes
 void GeneralSearch(std::map<std::string, Node*>&, std::vector<Node*> &, std::vector<Node*> &, Node *);
 void EnqueueBFS(std::map<std::string, Node*>&, std::vector<Node*> &, Node *);
 void EnqueueDFS(std::map<std::string, Node*>&, std::vector<Node*> &, Node *);
+void EnqueueUCS(std::map<std::string, Node*>&, std::vector<Node*> &, Node *);
+bool GoalTest(Node *, Node* );
 
 int main(int argc, char* argv[])
 {
@@ -77,7 +95,7 @@ int main(int argc, char* argv[])
     Node* n = new Node();
 
     n->name = "Alexandria";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Matruh", 159));
     n->children.push_back(ConnectedNode("Cairo", 112));
@@ -89,7 +107,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Nekhel";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Alexandria", 245));
     n->children.push_back(ConnectedNode("Suez", 72));
@@ -101,7 +119,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Suez";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Nekhel", 72));
 
@@ -111,7 +129,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Quseir";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Sohag", 163));
     n->children.push_back(ConnectedNode("Nekhel", 265));
@@ -122,7 +140,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Sohag";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Mut", 184));
     n->children.push_back(ConnectedNode("Qena", 69));
@@ -134,7 +152,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Qena";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Luxor", 33));
     n->children.push_back(ConnectedNode("Sohag", 69));
@@ -145,7 +163,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Luxor";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Qena", 33));
 
@@ -155,7 +173,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Kharga";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Mut", 98));
 
@@ -165,7 +183,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Mut";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Qasr Farafra", 126));
     n->children.push_back(ConnectedNode("Sohag", 184));
@@ -177,7 +195,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Qasr Farafra";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Bawiti", 104));
     n->children.push_back(ConnectedNode("Mut", 126));
@@ -188,7 +206,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Bawiti";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Siwa", 210));
     n->children.push_back(ConnectedNode("Cairo", 186));
@@ -200,7 +218,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Cairo";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Bawiti", 186));
     n->children.push_back(ConnectedNode("Alexandria", 112));
@@ -212,7 +230,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Asyut";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Cairo", 198));
 
@@ -222,7 +240,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Siwa";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Matruh", 181));
     n->children.push_back(ConnectedNode("Bawiti", 210));
@@ -233,7 +251,7 @@ int main(int argc, char* argv[])
     n = new Node();
 
     n->name = "Matruh";
-    n->isExpanded = false;
+    n->isQueued = false;
     n->totalCost = 0;
     n->children.push_back(ConnectedNode("Siwa", 159));
     n->children.push_back(ConnectedNode("Bawiti", 210));
@@ -242,6 +260,7 @@ int main(int argc, char* argv[])
 
     // Test that the tree works from going to Alexandria to Luxor
 
+    /*
     Node* test = cityNodes["Alexandria"];
     std::cout << "A Test from Getting to Luxor from Alexandria" << std::endl;
 
@@ -263,10 +282,11 @@ int main(int argc, char* argv[])
     std::cout << test->name << std::endl;
 
     std::cout << "END TEST" << std::endl;
+    */
 
     // Add Alexandria to the starting set of nodes for GeneralSearch()
     currentNodes.push_back(cityNodes["Alexandria"]);
-    currentNodes[0]->isExpanded = true;
+    currentNodes[0]->isQueued = true;
 
     // Run the Search Function
     // Argument 0 = map of all nodes
@@ -306,7 +326,7 @@ void GeneralSearch(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &
         Node* nodeToTest = currentNodes[0];
         currentNodes.erase(currentNodes.begin());
 
-        if (nodeToTest->name == goalNode->name)
+        if (GoalTest(nodeToTest, goalNode))
         {
             // Output the list of cities searched here
             std::cout << "Found GOAL!!!!! -> " << goalNode->name << std::endl;
@@ -328,9 +348,21 @@ void GeneralSearch(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &
         }
 
         // Queuing Function
-        //EnqueueBFS(cityNodes, currentNodes, nodeToTest); // BFS
-        EnqueueDFS(cityNodes, currentNodes, nodeToTest); // DFS
+        //EnqueueBFS(cityNodes, currentNodes, nodeToTest); // Breadth First Search (BFS)
+        //EnqueueDFS(cityNodes, currentNodes, nodeToTest); // Depth First Search (DFS)
+        EnqueueUCS(cityNodes, currentNodes, nodeToTest); // Uniform COst Search (UCS)
         exploredNodes.push_back(nodeToTest);
+
+        /*
+        std::cout << std::endl << nodeToTest->name << std::endl;
+
+        // Debug -> Print out contents of currentNodes list
+        for (int i = 0; i < currentNodes.size(); i++)
+        {
+            std::cout << currentNodes[i]->name << " ";
+        }
+        std::cout << std::endl;
+        */
     }
 }
 
@@ -341,7 +373,7 @@ void EnqueueBFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &cur
 
     for (unsigned int i = 0; i < nodeToTest->children.size(); i++)
     {
-        if (!cityNodes[nodeToTest->children[i].name]->isExpanded) // Check to see if the node has already been expanded
+        if (!cityNodes[nodeToTest->children[i].name]->isQueued) // Check to see if the node has already been expanded
         {
             expandedNames.push_back(nodeToTest->children[i].name);
         }
@@ -354,7 +386,7 @@ void EnqueueBFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &cur
     while (!expandedNames.empty())
     {
         currentNodes.push_back(cityNodes[expandedNames[0]]);
-        cityNodes[expandedNames[0]]->isExpanded = true;
+        cityNodes[expandedNames[0]]->isQueued = true;
         expandedNames.erase(expandedNames.begin());
     }
 }
@@ -366,7 +398,7 @@ void EnqueueDFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &cur
 
     for (unsigned int i = 0; i < nodeToTest->children.size(); i++)
     {
-        if (!cityNodes[nodeToTest->children[i].name]->isExpanded) // Check to see if the node has already been expanded
+        if (!cityNodes[nodeToTest->children[i].name]->isQueued) // Check to see if the node has already been expanded
         {
             expandedNames.push_back(nodeToTest->children[i].name);
         }
@@ -379,7 +411,51 @@ void EnqueueDFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &cur
     while (!expandedNames.empty())
     {
         currentNodes.insert(currentNodes.begin(), cityNodes[expandedNames[expandedNames.size() - 1]]);
-        cityNodes[expandedNames[expandedNames.size() - 1]]->isExpanded = true;
+        cityNodes[expandedNames[expandedNames.size() - 1]]->isQueued = true;
         expandedNames.erase(expandedNames.end());
     }
+}
+
+void EnqueueUCS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &currentNodes, Node *nodeToTest)
+{
+    isUCS = true;
+    for (unsigned int i = 0; i < nodeToTest->children.size(); i++)
+    {
+        if (!cityNodes[nodeToTest->children[i].name]->isQueued) // Check to see if the node has already been expanded
+        {
+            currentNodes.push_back(cityNodes[nodeToTest->children[i].name]);
+            currentNodes[currentNodes.size() - 1]->totalCost = nodeToTest->totalCost + nodeToTest->children[i].cost;
+            currentNodes[currentNodes.size() - 1]->isQueued = true;
+        }
+        // Check where the cost for something to a node is less than another way, and overwrite the more expensive cost
+        else if (nodeToTest->totalCost + nodeToTest->children[i].cost < cityNodes[nodeToTest->children[i].name]->totalCost)
+        {
+            // This is why I like pointers -> I do not need to loop again to find what I need to change
+            cityNodes[nodeToTest->children[i].name]->totalCost = nodeToTest->totalCost + nodeToTest->children[i].cost;
+        }
+    }
+
+    // Sort Them -> First based upon cost, and if they are the same, then by name
+    // Refer to functorUCS for the specific comparison used for std::sort()
+    std::sort(currentNodes.begin(), currentNodes.end(), functorUCS);
+}
+
+bool GoalTest(Node *nodeToTest, Node *goalNode)
+{
+    if (!isUCS) // If the Test is for BFS or DFS
+    {
+        if (nodeToTest->name == goalNode->name)
+        {
+            return true;
+        }
+    }
+    else // The test is for UCS, and it is much different
+    {
+        if (nodeToTest->name == goalNode->name) // Should I stop on first hit or not?
+        {
+            std::cout << "Cost to get to GoalNode: " << goalNode->totalCost << std::endl;
+            return true;
+        }
+    }
+    return false;
 }
