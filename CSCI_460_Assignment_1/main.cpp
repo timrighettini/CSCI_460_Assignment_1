@@ -25,6 +25,7 @@ Please prepare by reading through the relevant lecture materials.
 #include <iostream>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 // NOTE: -std=gnu++0x or -std=c++0x must be enabled for c++ 2011 stuff to work
 
@@ -56,10 +57,16 @@ struct Node
 };
 
 
+
+// Function Prototypes
+void GeneralSearch(std::map<std::string, Node*>&, std::vector<Node*> &);
+void EnvectorBFS(std::map<std::string, Node*>&, std::vector<Node*> &);
+
 int main(int argc, char* argv[])
 {
     // Instantiate the map
     std::map<std::string, Node*> cityNodes;
+    std::vector<Node*> currentNodes; // Will be the vector used for queueing for the three queueing functions
 
     // Build the tree
 
@@ -254,15 +261,35 @@ int main(int argc, char* argv[])
 
     std::cout << "END TEST" << std::endl;
 
-    // Run the Search Function
+    // Add Alexandria to the starting set of nodes for GeneralSearch()
+    currentNodes.push_back(cityNodes["Alexandria"]);
 
+    // Run the Search Function
+    GeneralSearch(cityNodes, currentNodes);
 
     // Make sure to deallocate everything on the heap
+    std::map<std::string, Node*>::iterator mapIterator = cityNodes.begin();
 
+    for (mapIterator = cityNodes.begin(); mapIterator != cityNodes.end(); ++mapIterator)
+    {
+        delete mapIterator->second;
+    }
+    cityNodes.clear();
+    currentNodes.clear();
 
     // Exit
 
-    std::cout << "Test" << std::endl;
+    std::cout << "Exiting..." << std::endl;
 
     return 0;
+}
+
+void GeneralSearch(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &currentNodes)
+{
+
+}
+
+void EnvectorBFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &currentNodes)
+{
+
 }
