@@ -61,6 +61,7 @@ struct Node
 // Function Prototypes
 void GeneralSearch(std::map<std::string, Node*>&, std::vector<Node*> &, std::vector<Node*> &, Node *);
 void EnqueueBFS(std::map<std::string, Node*>&, std::vector<Node*> &, Node *);
+void EnqueueDFS(std::map<std::string, Node*>&, std::vector<Node*> &, Node *);
 
 int main(int argc, char* argv[])
 {
@@ -68,6 +69,7 @@ int main(int argc, char* argv[])
     std::map<std::string, Node*> cityNodes;
     std::vector<Node*> currentNodes; // Will be the vector used for Queuing for the three Queuing functions
     std::vector<Node*> exploredNodes; // Will be the vector used for keeping track of what has been found so far
+    // NOTE: I use this vector as a queue. stack, and priority queue all at once to save on instantiating different lists
 
     // Build the tree
 
@@ -326,7 +328,8 @@ void GeneralSearch(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &
         }
 
         // Queuing Function
-        EnqueueBFS(cityNodes, currentNodes, nodeToTest); // BPS
+        //EnqueueBFS(cityNodes, currentNodes, nodeToTest); // BFS
+        EnqueueDFS(cityNodes, currentNodes, nodeToTest); // DFS
         exploredNodes.push_back(nodeToTest);
     }
 }
@@ -353,5 +356,30 @@ void EnqueueBFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &cur
         currentNodes.push_back(cityNodes[expandedNames[0]]);
         cityNodes[expandedNames[0]]->isExpanded = true;
         expandedNames.erase(expandedNames.begin());
+    }
+}
+
+void EnqueueDFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &currentNodes, Node *nodeToTest)
+{
+    // Add values from expanded node into a temp vector
+    std::vector<std::string> expandedNames;
+
+    for (unsigned int i = 0; i < nodeToTest->children.size(); i++)
+    {
+        if (!cityNodes[nodeToTest->children[i].name]->isExpanded) // Check to see if the node has already been expanded
+        {
+            expandedNames.push_back(nodeToTest->children[i].name);
+        }
+    }
+
+    // Sort Them
+    std::sort(expandedNames.begin(), expandedNames.end());
+
+    // Add them into the currentNodes Stack in reverse order
+    while (!expandedNames.empty())
+    {
+        currentNodes.insert(currentNodes.begin(), cityNodes[expandedNames[expandedNames.size() - 1]]);
+        cityNodes[expandedNames[expandedNames.size() - 1]]->isExpanded = true;
+        expandedNames.erase(expandedNames.end());
     }
 }
