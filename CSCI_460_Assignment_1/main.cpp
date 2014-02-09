@@ -103,8 +103,8 @@ int main(int argc, char* argv[])
     n->name = "Quseir";
     n->isExpanded = false;
     n->totalCost = 0;
-    n->children.push_back(ConnectedNode("Nekhel", 265));
     n->children.push_back(ConnectedNode("Sohag", 163));
+    n->children.push_back(ConnectedNode("Nekhel", 265));
 
     cityNodes[n->name] = n;
 
@@ -232,7 +232,27 @@ int main(int argc, char* argv[])
 
     // Test that the tree works from going to Alexandria to Luxor
 
+    Node* test = cityNodes["Alexandria"];
+    std::cout << "A Test from Getting to Luxor from Alexandria" << std::endl;
 
+    std::cout << test->name << std::endl;
+    test = cityNodes[test->children[2].name]; // Go to Nekhel
+
+    std::cout << test->name << std::endl;
+    test = cityNodes[test->children[2].name]; // Go to Quseir
+
+    std::cout << test->name << std::endl;
+    test = cityNodes[test->children[0].name]; // Go to Sohag
+
+    std::cout << test->name << std::endl;
+    test = cityNodes[test->children[1].name]; // Go to Qeua
+
+    std::cout << test->name << std::endl;
+    test = cityNodes[test->children[0].name]; // Go to Luxor
+
+    std::cout << test->name << std::endl;
+
+    std::cout << "END TEST" << std::endl;
 
     // Run the Search Function
 
