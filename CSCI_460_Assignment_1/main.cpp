@@ -29,32 +29,220 @@ Please prepare by reading through the relevant lecture materials.
 // NOTE: -std=gnu++0x or -std=c++0x must be enabled for c++ 2011 stuff to work
 
 // Globals to be used for the program
-struct node
+
+struct ConnectedNode // Will be a struct used for children to expand from
 {
-	std::string name; // Name of the node
-	int relativeCost; // Cost of the node itself
+    std::string name;
+    int cost; // Cost between this Node and the Node it is attached to
 
-	// To be used for Uniform Cost Search
-	// Will be used for the cost up to this node,
-	// and can be made smaller and smaller as time goes on
-	int totalCost;
-
-	std::vector<std::string> children; // List of descendants
-	bool isExpanded; // If the node is expanded, this will be true, will prevent loops
+    ConnectedNode(std::string name, int cost)
+    {
+        this->name = name;
+        this->cost = cost;
+    }
 };
+
+struct Node
+{
+    std::vector<ConnectedNode> children; // List of descendants
+    std::string name; // Name of the Node
+
+    // To be used for Uniform Cost Search
+    // Will be used for the cost up to this Node,
+    // and can be made smaller and smaller as time goes on
+    int totalCost;
+
+    bool isExpanded; // If the Node is expanded, this will be true, will prevent loops
+};
+
 
 int main(int argc, char* argv[])
 {
-	// Instantiate the map
-    std::map<std::string, node*> cityNodes;
+    // Instantiate the map
+    std::map<std::string, Node*> cityNodes;
 
-	// Build the tree
+    // Build the tree
 
-	// Test that the tree works from going to Alexandria to Luxor
+    // Alexandria Node
+    Node* n = new Node();
 
-	// Run the Search Function
+    n->name = "Alexandria";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Matruh", 159));
+    n->children.push_back(ConnectedNode("Cairo", 112));
+    n->children.push_back(ConnectedNode("Nekhel", 245));
 
-	std::cout << "Test" << std::endl;
+    cityNodes[n->name] = n;
 
-	return 0;
+    // Nekhel Node
+    n = new Node();
+
+    n->name = "Nekhel";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Alexandria", 245));
+    n->children.push_back(ConnectedNode("Suez", 72));
+    n->children.push_back(ConnectedNode("Quseir", 265));
+
+    cityNodes[n->name] = n;
+
+    // Suez Node
+    n = new Node();
+
+    n->name = "Suez";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Nekhel", 72));
+
+    cityNodes[n->name] = n;
+
+    // Quseir Node
+    n = new Node();
+
+    n->name = "Quseir";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Nekhel", 265));
+    n->children.push_back(ConnectedNode("Sohag", 163));
+
+    cityNodes[n->name] = n;
+
+    // Sohag Node
+    n = new Node();
+
+    n->name = "Sohag";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Mut", 184));
+    n->children.push_back(ConnectedNode("Qena", 69));
+    n->children.push_back(ConnectedNode("Quseir", 163));
+
+    cityNodes[n->name] = n;
+
+    // Qena Node
+    n = new Node();
+
+    n->name = "Qena";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Luxor", 33));
+    n->children.push_back(ConnectedNode("Sohag", 69));
+
+    cityNodes[n->name] = n;
+
+    // Luxor Node
+    n = new Node();
+
+    n->name = "Luxor";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Qena", 33));
+
+    cityNodes[n->name] = n;
+
+    // Kharga Node
+    n = new Node();
+
+    n->name = "Kharga";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Mut", 98));
+
+    cityNodes[n->name] = n;
+
+    // Mut Node
+    n = new Node();
+
+    n->name = "Mut";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Qasr Farafra", 126));
+    n->children.push_back(ConnectedNode("Sohag", 184));
+    n->children.push_back(ConnectedNode("Kharga", 98));
+
+    cityNodes[n->name] = n;
+
+    // Qasr Farafra Node
+    n = new Node();
+
+    n->name = "Qasr Farafra";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Bawiti", 104));
+    n->children.push_back(ConnectedNode("Mut", 126));
+
+    cityNodes[n->name] = n;
+
+    // Bawiti Node
+    n = new Node();
+
+    n->name = "Bawiti";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Siwa", 210));
+    n->children.push_back(ConnectedNode("Cairo", 186));
+    n->children.push_back(ConnectedNode("Qasr Farafra", 104));
+
+    cityNodes[n->name] = n;
+
+    // Cairo Node
+    n = new Node();
+
+    n->name = "Cairo";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Bawiti", 186));
+    n->children.push_back(ConnectedNode("Alexandria", 112));
+    n->children.push_back(ConnectedNode("Asyut", 198));
+
+    cityNodes[n->name] = n;
+
+    // Asyut Node
+    n = new Node();
+
+    n->name = "Asyut";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Cairo", 198));
+
+    cityNodes[n->name] = n;
+
+    // Siwa Node
+    n = new Node();
+
+    n->name = "Siwa";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Matruh", 181));
+    n->children.push_back(ConnectedNode("Bawiti", 210));
+
+    cityNodes[n->name] = n;
+
+    // Matruh Node
+    n = new Node();
+
+    n->name = "Matruh";
+    n->isExpanded = false;
+    n->totalCost = 0;
+    n->children.push_back(ConnectedNode("Siwa", 159));
+    n->children.push_back(ConnectedNode("Bawiti", 210));
+
+    cityNodes[n->name] = n;
+
+    // Test that the tree works from going to Alexandria to Luxor
+
+
+
+    // Run the Search Function
+
+
+    // Make sure to deallocate everything on the heap
+
+
+    // Exit
+
+    std::cout << "Test" << std::endl;
+
+    return 0;
 }
