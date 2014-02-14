@@ -1,25 +1,7 @@
 // CSCI_460_Assignment_1.cpp : Defines the entry point for the console application.
 //
 
-/*
-NOTE:
-
-There is a typo in the assignment.  The correct partial solution for BFS should read:
-
-Alexandria, Cairo, Matruh, Nekhel, Asyut, Bawiti, Siwa, Quseir, Suez...Luxor
-
-and NOT
-
-Alexandria, Cairo, Matruh, Nekhel, Suez, Asyut, Bawiti,...,...etc, Luxor
-
-Quiz 1 will be held Tuesday 2/11/2014 at 6 pm in class.
-It is open book and open notes.
-Topics include problem solving,
-environment analysis, and blind search algorithms.
-Questions will be strictly restricted to just these topics.
-Please prepare by reading through the relevant lecture materials.
-
-*/
+// Preprocessor Directives
 
 #include <map>
 #include <iostream>
@@ -28,6 +10,7 @@ Please prepare by reading through the relevant lecture materials.
 #include <algorithm>
 
 // NOTE: -std=gnu++0x or -std=c++0x must be enabled for c++ 2011 stuff to work
+// NOTEL C++ 2011 does NOT work on aludra, using C++ 1998 for this assignment
 
 // Globals to be used for the program
 
@@ -43,7 +26,7 @@ struct ConnectedNode // Will be a struct used for children to expand from
     }
 };
 
-struct Node
+struct Node // Struct for holding node information
 {
     std::vector<ConnectedNode> children; // List of descendants
     std::string name; // Name of the Node
@@ -56,7 +39,7 @@ struct Node
     bool isQueued; // If the Node is expanded, this will be true, will prevent loops
 };
 
-// Used for a aorting comparison
+// Used for a sorting comparison
 struct FunctorUCS
 {
         // Overloading () operators for std::sort()
@@ -258,32 +241,6 @@ int main(int argc, char* argv[])
 
     cityNodes[n->name] = n;
 
-    // Test that the tree works from going to Alexandria to Luxor
-
-    /*
-    Node* test = cityNodes["Alexandria"];
-    std::cout << "A Test from Getting to Luxor from Alexandria" << std::endl;
-
-    std::cout << test->name << std::endl;
-    test = cityNodes[test->children[2].name]; // Go to Nekhel
-
-    std::cout << test->name << std::endl;
-    test = cityNodes[test->children[2].name]; // Go to Quseir
-
-    std::cout << test->name << std::endl;
-    test = cityNodes[test->children[0].name]; // Go to Sohag
-
-    std::cout << test->name << std::endl;
-    test = cityNodes[test->children[1].name]; // Go to Qeua
-
-    std::cout << test->name << std::endl;
-    test = cityNodes[test->children[0].name]; // Go to Luxor
-
-    std::cout << test->name << std::endl;
-
-    std::cout << "END TEST" << std::endl;
-    */
-
     // Add Alexandria to the starting set of nodes for GeneralSearch()
     currentNodes.push_back(cityNodes["Alexandria"]);
     currentNodes[0]->isQueued = true;
@@ -322,14 +279,14 @@ void GeneralSearch(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &
             return;
         }
 
-        // Goal Test
+        // Grab the first node off of the currentNodes queue
         Node* nodeToTest = currentNodes[0];
         currentNodes.erase(currentNodes.begin());
 
+        // Goal Test
         if (GoalTest(nodeToTest, goalNode))
         {
             // Output the list of cities searched here
-            std::cout << "Found GOAL!!!!! -> " << goalNode->name << std::endl;
             std::cout << "Order of cities traversed: " << std::endl;
             for (unsigned int i = 0; i < exploredNodes.size(); i++)
             {
@@ -342,27 +299,15 @@ void GeneralSearch(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &
                 {
                     std::cout << ", " << goalNode->name << std::endl;
                 }
-
             }
             return;
         }
 
         // Queuing Function
-        //EnqueueBFS(cityNodes, currentNodes, nodeToTest); // Breadth First Search (BFS)
+        EnqueueBFS(cityNodes, currentNodes, nodeToTest); // Breadth First Search (BFS)
         //EnqueueDFS(cityNodes, currentNodes, nodeToTest); // Depth First Search (DFS)
-        EnqueueUCS(cityNodes, currentNodes, nodeToTest); // Uniform COst Search (UCS)
+        //EnqueueUCS(cityNodes, currentNodes, nodeToTest); // Uniform Cost Search (UCS)
         exploredNodes.push_back(nodeToTest);
-
-        /*
-        std::cout << std::endl << nodeToTest->name << std::endl;
-
-        // Debug -> Print out contents of currentNodes list
-        for (int i = 0; i < currentNodes.size(); i++)
-        {
-            std::cout << currentNodes[i]->name << " ";
-        }
-        std::cout << std::endl;
-        */
     }
 }
 
@@ -383,6 +328,8 @@ void EnqueueBFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &cur
     std::sort(expandedNames.begin(), expandedNames.end());
 
     // Add them into the currentNodes Queue
+    // Insert each element into the back of the vector,
+    // as seen with a queue data structure
     while (!expandedNames.empty())
     {
         currentNodes.push_back(cityNodes[expandedNames[0]]);
@@ -408,6 +355,8 @@ void EnqueueDFS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &cur
     std::sort(expandedNames.begin(), expandedNames.end());
 
     // Add them into the currentNodes Stack in reverse order
+    // so currentNodes acts like a stack, and the node that
+    // is first in the temp list comes up first.
     while (!expandedNames.empty())
     {
         currentNodes.insert(currentNodes.begin(), cityNodes[expandedNames[expandedNames.size() - 1]]);
@@ -437,22 +386,26 @@ void EnqueueUCS(std::map<std::string, Node*> &cityNodes, std::vector<Node*> &cur
 
     // Sort Them -> First based upon cost, and if they are the same, then by name
     // Refer to functorUCS for the specific comparison used for std::sort()
+    // Notice I do not need a temp list here, I am adding straight to currentNodes
     std::sort(currentNodes.begin(), currentNodes.end(), functorUCS);
 }
 
+// Function for GoalTest -> Declared here versus inside GeneralSearch() to make things cleaner
 bool GoalTest(Node *nodeToTest, Node *goalNode)
 {
     if (!isUCS) // If the Test is for BFS or DFS
     {
         if (nodeToTest->name == goalNode->name)
         {
+            std::cout << "Found GOAL!!!!! -> " << goalNode->name << std::endl;
             return true;
         }
     }
-    else // The test is for UCS, and it is much different
+    else // The test is for UCS, and it is a little different
     {
         if (nodeToTest->name == goalNode->name) // Should I stop on first hit or not?
         {
+            std::cout << "Found GOAL!!!!! -> " << goalNode->name << std::endl;
             std::cout << "Cost to get to GoalNode: " << goalNode->totalCost << std::endl;
             return true;
         }
